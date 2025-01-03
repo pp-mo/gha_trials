@@ -1,0 +1,33 @@
+# Roughly based on scitools-workflows "refresh_lockfiles"
+name: called-action
+
+
+on:
+  workflow_call:
+
+jobs:
+  gen_lockfiles:
+    # This is a matrix job: it splits to create new lockfiles for each
+    # of the CI test python versions.
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: install and build
+        run: |
+          source $CONDA/bin/activate base
+          conda install -y -c conda-forge libarchive mamba conda-lock
+      - name: show working env
+        run: |
+          conda list --explicit
+      - name: generate lockfile
+        run: |
+          $CONDA/bin/conda-lock lock -k explicit -p linux-64 -f requirements/test_requirements_py312.yml
+      - name: show result
+        run: |
+          cat conda-linux-64.lock
+      - name: upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: lock-artifact
+          path: conda-linux-64.lock
