@@ -15,5 +15,6 @@ on:
 
 jobs:
   call_it:
-    uses: workflows/common/callable
+    uses: workflows/common/callable@v1
+
 
